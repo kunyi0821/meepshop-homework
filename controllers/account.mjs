@@ -1,19 +1,21 @@
-import Receipt from "../modal/receipt.mjs";
+import Receipt from "../model/receipt.mjs";
+import codeType from "./codeType.mjs";
+import InmemoryTransaction from "../model/inmemoryTransaction.mjs";
 
 const accountController = {
 
     depositAccount: async (req, res) => {
-        const user_id = parseInt(req.params.user_id);
+        const userId = parseInt(req.params.userId);
 
         const { amount } = req.body;
 
-        const user = global.users.find(user => user.user_id === user_id); 
+        const user = global.users.find(user => user.userId === userId); 
 
         if (!user) {
-            console.error(`user_id: ${user_id} is not exist.`);
-            res.status(400).json({
+            console.error(`userId: ${userId} is not exist.`);
+            res.status(404).json({
                 code: "0004",
-                message: "user is not exist."
+                message: codeType["0004"]
             });
             return;
         }
@@ -22,19 +24,19 @@ const accountController = {
             console.error(`amount is necessary`);
             res.status(400).json({
                 code: "0002",
-                message: "amount is necessary."
+                message: codeType["0002"]
             });
             return;
         }
         
         user.balance += amount;
 
-        const newReceipt = new Receipt(new Date(), amount, user_id, user_id);
-        user.transaction_history.push(newReceipt);
+        const newReceipt = new Receipt(new Date(), amount, userId, userId);
+        user.transactionHistory.push(newReceipt);
 
         res.status(201).json({
             code: "0000",
-            message: "Success"
+            message: codeType["0000"]
         });
 
         return;
@@ -42,17 +44,17 @@ const accountController = {
 
     withdrawAccount: async (req, res) => {
 
-        const user_id = parseInt(req.params.user_id);
+        const userId = parseInt(req.params.userId);
 
         const { amount } = req.body;
 
-        const user = global.users.find(user => user.user_id === user_id); 
-
+        const user = global.users.find(user => user.userId === userId); 
+        const userIndex = global.users.findIndex(user => user.userId === userId);
         if (!user) {
-            console.error(`user_id: ${user_id} is not exist.`);
-            res.status(400).json({
+            console.error(`userId: ${userId} is not exist.`);
+            res.status(404).json({
                 code: "0004",
-                message: "user is not exist."
+                message: codeType["0004"]
             });
             return;
         }
@@ -61,68 +63,85 @@ const accountController = {
             console.error(`amount is necessary`);
             res.status(400).json({
                 code: "0002",
-                message: "amount is necessary."
+                message: codeType["0002"]
             });
             return;
         }
-
-
 
         if (user.balance < amount) {
-            console.error(`user_id: ${user_id} balance is insufficient`);
+            console.error(`userId: ${userId} balance is insufficient`);
             res.status(400).json({
                 code: "0003",
-                message: "Your account balance is insufficient."
+                message: codeType["0003"]
             });
 
             return;
         }
 
-        user.balance -= amount;
+        const transactionManager = new InmemoryTransaction();
+        transactionManager.beginTransaction(userId, user);
 
-        const newReceipt = new Receipt(new Date(), -amount, user_id, user_id);
-        user.transaction_history.push(newReceipt);
+        try {
 
-        res.status(201).json({
-            code: "0000",
-            message: "Success"
-        });
+            if (user.balance < amount) {
+                throw Error();
+            }
+            user.balance -= amount;
+            const newReceipt = { date: new Date(), amount: -amount, userId };
+            user.transactionHistory.push(newReceipt);
+      
+            // Commit transaction
+            transactionManager.commitTransaction(userId);
+      
+            res.status(201).json({ code: "0000", message: codeType["0000"]});
 
-        return;
+            return;
+        } catch (error) {
+            // Rollback transaction
+            const originalUser = transactionManager.rollbackTransaction(userId);
+            if (originalUser) {
+                global.users[userIndex] = originalUser;
+            }
+      
+            res.status(500).json({ code: "0007", message: codeType["0007"], error });
+            return
+        }
     },
 
     transferAccount: async (req, res) => {
 
-        const user_id = parseInt(req.params.user_id);
-        const { amount, transfer_user_id } = req.body;
+        const userId = parseInt(req.params.userId);
+        const { amount, transferUserId } = req.body;
 
-        const user = global.users.find(user => user.user_id === user_id);
+        const user = global.users.find(user => user.userId === userId);
+        const userIndex = global.users.findIndex(user => user.userId === userId);
 
-        const transfer_user = global.users.find(user => user.user_id === transfer_user_id);
+        const transferUser = global.users.find(user => user.userId === transferUserId);
+        const transferIndex = global.users.findIndex(user => user.userId === transferUserId);
 
-        if (user_id === transfer_user_id) {
+        if (userId === transferUserId) {
             console.error(`Can not transfer to yourself.`);
             res.status(400).json({
                 code: "0006",
-                message: "Can not transfer to yourself."
+                message: codeType["0006"]
             });
             return;
         }
 
         if (!user) {
-            console.error(`user_id: ${user_id} is not exist.`);
-            res.status(400).json({
+            console.error(`userId: ${userId} is not exist.`);
+            res.status(404).json({
                 code: "0004",
-                message: "user is not exist."
+                message: codeType["0004"]
             });
             return;
         }
   
-        if (!transfer_user) {
-            console.error(`user_id: ${transfer_user_id} is not exist.`);
+        if (!transferUser) {
+            console.error(`userId: ${transferUserId} is not exist.`);
             res.status(400).json({
                 code: "0005",
-                message: "transfer_user_id is not exist."
+                message: codeType["0005"]
             });
             return;
         }
@@ -131,36 +150,58 @@ const accountController = {
             console.error(`amount is necessary`);
             res.status(400).json({
                 code: "0002",
-                message: "amount is necessary."
+                message: codeType["0002"]
             });
             return;
         }
 
 
         if (user.balance < amount) {
-            console.error(`user_id: ${user_id} balance is insufficient`);
+            console.error(`userId: ${userId} balance is insufficient`);
             res.status(400).json({
                 code: "0003",
-                message: "Your account balance is insufficient."
+                message: codeType["0003"]
             });
             return;
         }
 
-        user.balance -= amount;
-        transfer_user.balance += amount;
+        const transactionManager = new InmemoryTransaction();
+        transactionManager.beginTransaction(userId, user);
+        transactionManager.beginTransaction(transferUserId, transferUser);
+        try {
+            if (user.balance < amount) {
+                throw Error();
+            }
+            user.balance -= amount;
+            transferUser.balance += amount;
 
-        const userReceipt = new Receipt(new Date(), -amount, user_id, transfer_user_id);
-        user.transaction_history.push(userReceipt);
+            const userReceipt = new Receipt(new Date(), -amount, userId, transferUserId);
+            user.transactionHistory.push(userReceipt);
 
-        const tranferReceipt = new Receipt(new Date(), amount, user_id, transfer_user_id);
-        transfer_user.transaction_history.push(tranferReceipt);
+            const tranferReceipt = new Receipt(new Date(), amount, userId, transferUserId);
+            transferUser.transactionHistory.push(tranferReceipt);
 
-        res.status(201).json({
-            code: "0000",
-            message: "Success"
-        });
+            res.status(201).json({
+                code: "0000",
+                message: codeType["0000"]
+            });
 
-        return;
+            return;
+        } catch (error) {
+            // Rollback transaction
+            const originalUser = transactionManager.rollbackTransaction(userId);
+            if (originalUser) {
+                global.users[userIndex] = originalUser;
+            }
+
+            const originalTransferUser = transactionManager.rollbackTransaction(transferUserId);
+            if (originalTransferUser) {
+                global.users[transferIndex] = originalTransferUser;
+            }
+      
+            res.status(500).json({ code: "0007", message: codeType["0007"], error });
+            return
+        }
     }
 };
   

@@ -1,16 +1,12 @@
+import userController from "../controllers/user.mjs";
 
 class User {
     constructor(name, balance) {
         // Generate unique user ID
-        this.user_id = User.getNextUserId(); 
+        this.userId = userController.getNextUserId(); 
         this.name = name;
         this.balance = balance >= 0 ? balance : 0;
-        this.transaction_history = [];
-    }
-
-    static getNextUserId() {
-        User.lastUserId = (User.lastUserId || 0) + 1;
-        return User.lastUserId;
+        this.transactionHistory = [];
     }
 }
 

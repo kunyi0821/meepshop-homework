@@ -9,7 +9,7 @@ describe("Integration Tests for User and Account Controllers", () => {
         const res = await request(app)
             .get("/user/1")
             .send(); 
-        expect(res.statusCode).to.equal(400);
+        expect(res.statusCode).to.equal(404);
         expect(res.body.code).to.equal("0004");
         expect(res.body.message).to.equal("user is not exist.");
     })
@@ -18,7 +18,7 @@ describe("Integration Tests for User and Account Controllers", () => {
     it("should add a new user", async () => {
         const res = await request(app)
             .post("/user")
-            .send({ user_name: "Jhon" }); 
+            .send({ userName: "Jhon" }); 
 
         expect(res.statusCode).to.equal(201);
         expect(res.body.code).to.equal("0000");
@@ -29,15 +29,15 @@ describe("Integration Tests for User and Account Controllers", () => {
     it("should get the user", async () => {
         const res = await request(app)
             .get("/user/1")
-            .send({ user_name: "Jhon" }); 
+            .send({ userName: "Jhon" }); 
 
         expect(res.statusCode).to.equal(200);
         expect(res.body.code).to.equal("0000");
         expect(res.body.message).to.equal("Success");
     });
 
-    // can not depostic
-    it("should be depostic", async () => {
+    // can not deposit
+    it("should be deposit", async () => {
         const res = await request(app)
             .put("/account/1/deposit")
             .send();
@@ -88,14 +88,14 @@ describe("Integration Tests for User and Account Controllers", () => {
 
         expect(res.statusCode).to.equal(400);
         expect(res.body.code).to.equal("0005");
-        expect(res.body.message).to.equal("transfer_user_id is not exist.");
+        expect(res.body.message).to.equal("transferUserId is not exist.");
     });
 
     // add transfer user
     it("should add a new user", async () => {
         const res = await request(app)
             .post("/user")
-            .send({ user_name: "Amy" }); 
+            .send({ userName: "Amy" }); 
 
         expect(res.statusCode).to.equal(201);
         expect(res.body.code).to.equal("0000");
@@ -106,7 +106,7 @@ describe("Integration Tests for User and Account Controllers", () => {
      it("should not be transfer", async () => {
         const res = await request(app)
             .put("/account/1/transfer")
-            .send({transfer_user_id: 2});
+            .send({transferUserId: 2});
 
         expect(res.statusCode).to.equal(400);
         expect(res.body.code).to.equal("0002");
@@ -117,7 +117,7 @@ describe("Integration Tests for User and Account Controllers", () => {
     it("should not be transfer", async () => {
         const res = await request(app)
             .put("/account/1/transfer")
-            .send({transfer_user_id: 2, amount: 100});
+            .send({transferUserId: 2, amount: 100});
 
         expect(res.statusCode).to.equal(400);
         expect(res.body.code).to.equal("0003");
@@ -140,7 +140,7 @@ describe("Integration Tests for User and Account Controllers", () => {
     it("should not be transfer", async () => {
         const res = await request(app)
             .put("/account/1/transfer")
-            .send({transfer_user_id: 2, amount: 100});
+            .send({transferUserId: 2, amount: 100});
 
         expect(res.statusCode).to.equal(201);
         expect(res.body.code).to.equal("0000");

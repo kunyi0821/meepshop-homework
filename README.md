@@ -1,3 +1,6 @@
+
+node -version: v20.11.0
+
 1. 先下載相關套件
 ```
 npm install

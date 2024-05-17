@@ -2,10 +2,10 @@ import express from "express";
 import accountController from "../controllers/account.mjs";
 const router = express.Router();
 
-router.put("/:user_id/deposit", accountController.depositAccount);
+router.put("/:userId/deposit", accountController.depositAccount);
 
-router.put("/:user_id/withdraw", accountController.withdrawAccount);
+router.put("/:userId/withdraw", accountController.withdrawAccount);
 
-router.put("/:user_id/transfer", accountController.transferAccount);
+router.put("/:userId/transfer", accountController.transferAccount);
   
 export default router;

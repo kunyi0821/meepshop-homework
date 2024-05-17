@@ -14,7 +14,7 @@ describe("accountController", () => {
     describe("depositAccount", () => {
         it("should return user is missing", async () => {
 
-            const req = { params: {user_id: 1}, body: { } };
+            const req = { params: {userId: 1}, body: { } };
 
             const res = {
                 status: (function (status) {
@@ -29,7 +29,7 @@ describe("accountController", () => {
 
             await accountController.depositAccount(req, res);
 
-            expect(res.status).to.deep.equal(400);
+            expect(res.status).to.deep.equal(404);
             expect(res.body.code).to.equal("0004");
             expect(res.body.message).to.equal("user is not exist.");
         });
@@ -37,14 +37,14 @@ describe("accountController", () => {
         it("should return amount is necessary", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { amount: 0 } };
+            const req = { params: {userId: 1}, body: { amount: 0 } };
 
             const res = {
                 status: (function (status) {
@@ -67,14 +67,14 @@ describe("accountController", () => {
         it("should be success", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { amount: 100 } };
+            const req = { params: {userId: 1}, body: { amount: 100 } };
 
             const res = {
                 status: (function (status) {
@@ -99,7 +99,7 @@ describe("accountController", () => {
     describe("withdrawAccount", () => {
         it("should return user is missing", async () => {
 
-            const req = { params: {user_id: 1}, body: { } };
+            const req = { params: {userId: 1}, body: { } };
 
             const res = {
                 status: (function (status) {
@@ -114,7 +114,7 @@ describe("accountController", () => {
 
             await accountController.withdrawAccount(req, res);
 
-            expect(res.status).to.deep.equal(400);
+            expect(res.status).to.deep.equal(404);
             expect(res.body.code).to.equal("0004");
             expect(res.body.message).to.equal("user is not exist.");
         });
@@ -122,14 +122,14 @@ describe("accountController", () => {
         it("should return amount is necessary", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { amount: 0 } };
+            const req = { params: {userId: 1}, body: { amount: 0 } };
 
             const res = {
                 status: (function (status) {
@@ -152,14 +152,14 @@ describe("accountController", () => {
         it("should return balance is insufficient.be success", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { amount: 100 } };
+            const req = { params: {userId: 1}, body: { amount: 100 } };
 
             const res = {
                 status: (function (status) {
@@ -182,14 +182,14 @@ describe("accountController", () => {
         it("should be success", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 100,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { amount: 100 } };
+            const req = { params: {userId: 1}, body: { amount: 100 } };
 
             const res = {
                 status: (function (status) {
@@ -214,7 +214,7 @@ describe("accountController", () => {
     describe("transferAccount", () => {
         it("should return user is missing", async () => {
 
-            const req = { params: {user_id: 1}, body: { } };
+            const req = { params: {userId: 1}, body: { } };
 
             const res = {
                 status: (function (status) {
@@ -229,7 +229,7 @@ describe("accountController", () => {
 
             await accountController.transferAccount(req, res);
 
-            expect(res.status).to.deep.equal(400);
+            expect(res.status).to.deep.equal(404);
             expect(res.body.code).to.equal("0004");
             expect(res.body.message).to.equal("user is not exist.");
         });
@@ -237,14 +237,14 @@ describe("accountController", () => {
         it("should return transfer user is not exist", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: {} };
+            const req = { params: {userId: 1}, body: {} };
 
             const res = {
                 status: (function (status) {
@@ -260,20 +260,20 @@ describe("accountController", () => {
 
             expect(res.status).to.deep.equal(400);
             expect(res.body.code).to.equal("0005");
-            expect(res.body.message).to.equal("transfer_user_id is not exist.");
+            expect(res.body.message).to.equal("transferUserId is not exist.");
         });
 
         it("should return can not transfer to yourself.", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { transfer_user_id: 1 } };
+            const req = { params: {userId: 1}, body: { transferUserId: 1 } };
 
             const res = {
                 status: (function (status) {
@@ -296,14 +296,14 @@ describe("accountController", () => {
         it("should return transfer user is not exist", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { transfer_user_id: 2 } };
+            const req = { params: {userId: 1}, body: { transferUserId: 2 } };
 
             const res = {
                 status: (function (status) {
@@ -320,27 +320,27 @@ describe("accountController", () => {
 
             expect(res.status).to.deep.equal(400);
             expect(res.body.code).to.equal("0005");
-            expect(res.body.message).to.equal("transfer_user_id is not exist.");
+            expect(res.body.message).to.equal("transferUserId is not exist.");
         });
 
         it("should return amount is necessary", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
             global.users.push({
-                user_id: 2,
+                userId: 2,
                 name: "Amy",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { transfer_user_id: 2, } };
+            const req = { params: {userId: 1}, body: { transferUserId: 2, } };
 
             const res = {
                 status: (function (status) {
@@ -363,21 +363,21 @@ describe("accountController", () => {
         it("should return balance is insufficient.", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
             global.users.push({
-                user_id: 2,
+                userId: 2,
                 name: "Amy",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { transfer_user_id: 2, amount: 100} };
+            const req = { params: {userId: 1}, body: { transferUserId: 2, amount: 100} };
 
             const res = {
                 status: (function (status) {
@@ -400,21 +400,21 @@ describe("accountController", () => {
         it("should be success", async () => {
 
             global.users.push({
-                user_id: 1,
+                userId: 1,
                 name: "Jhon",
                 balance: 100,
-                transaction_history: []
+                transactionHistory: []
             })
 
             global.users.push({
-                user_id: 2,
+                userId: 2,
                 name: "Amy",
                 balance: 0,
-                transaction_history: []
+                transactionHistory: []
             })
 
         
-            const req = { params: {user_id: 1}, body: { transfer_user_id: 2, amount: 100} };
+            const req = { params: {userId: 1}, body: { transferUserId: 2, amount: 100} };
 
             const res = {
                 status: (function (status) {

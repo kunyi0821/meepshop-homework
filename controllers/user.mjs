@@ -1,24 +1,25 @@
-import User from "../modal/user.mjs";
+import User from "../model/user.mjs";
+import codeType from "./codeType.mjs";
 
 const userController = {
     findUser: async (req, res) => {
 
-        const user_id = parseInt(req.params.user_id);
+        const userId = parseInt(req.params.userId);
 
-        const user = global.users.find(user => user.user_id === user_id); 
+        const user = global.users.find(user => user.userId === userId); 
 
         if (!user) {
-            console.error(`user_id: ${user_id} is not exist.`);
-            res.status(400).json({
+            console.error(`userId: ${userId} is not exist.`);
+            res.status(404).json({
                 code: "0004",
-                message: "user is not exist."
+                message: codeType["0004"]
             });
             return;
         }
         
         res.status(200).json({
             code: "0000",
-            message: "Success",
+            message: codeType["0000"],
             data: user
         });
 
@@ -26,23 +27,28 @@ const userController = {
     },
 
     addUser: async (req, res) => {
-        const { user_name } = req.body;
-        if (!user_name) {   
-            console.error("user_name is necessary");
+        const { userName } = req.body;
+        if (!userName) {   
+            console.error("userName is necessary");
             res.status(400).json({
                 code: "0001",
-                message: "user_name is necessary"
+                message: codeType["0001"]
             });
             return;
         }
-        const newUser = new User(user_name, 0);
+        const newUser = new User(userName, 0);
         global.users.push(newUser)
 
         res.status(201).json({
             code: "0000",
-            message: "Success"
+            message: codeType["0000"]
         });
         return;
+    },
+
+    getNextUserId() {
+        User.lastUserId = (User.lastUserId || 0) + 1;
+        return User.lastUserId;
     }
 };
   
