@@ -1,0 +1,13 @@
+version: '3'
+services:
+  # Node.js App
+  meepshop-app:
+    #image: node:20 # 選擇 Node.js 版本
+    build: .
+    image: meepshop-app
+    container_name: meepshop-app
+    working_dir: /
+    volumes:
+      - .:/app # 將本地檔案映射到容器中
+    ports:
+      - "3000:3000" # 將容器的 3000 port 映射到主機的 3000 port

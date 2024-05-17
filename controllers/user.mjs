@@ -16,22 +16,23 @@ const userController = {
             return;
         }
         
-        res.status(200).json(user);
+        res.status(200).json({
+            code: "0000",
+            message: "Success",
+            data: user
+        });
 
         return;
     },
 
     addUser: async (req, res) => {
-
         const { user_name } = req.body;
-
-        if (!user_name) {
+        if (!user_name) {   
             console.error("user_name is necessary");
             res.status(400).json({
                 code: "0001",
                 message: "user_name is necessary"
             });
-
             return;
         }
         const newUser = new User(user_name, 0);
@@ -41,7 +42,6 @@ const userController = {
             code: "0000",
             message: "Success"
         });
-
         return;
     }
 };
